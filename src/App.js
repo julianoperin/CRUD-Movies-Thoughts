@@ -5,16 +5,22 @@ import axios from "axios";
 function App() {
   const [movieName, setMovieName] = useState("");
   const [review, setReview] = useState("");
+  const [movieList, setMovieList] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/api/get").then((response) => {
+      const movieList = response.data;
+      setMovieList(movieList);
+    });
+  }, []);
 
   const submitReview = () => {
-    axios
-      .post("http://localhost:3001/api/insert", {
-        movieName: movieName,
-        movieReview: review,
-      })
-      .then(() => {
-        alert("Successfully inserted!");
-      });
+    axios.post("http://localhost:3001/api/insert", {
+      movieName: movieName,
+      movieReview: review,
+    });
+
+    setMovieList([...movieList, { movieName: movieName, movieReview: review }]);
 
     setMovieName("");
     setReview("");
@@ -41,6 +47,13 @@ function App() {
         />
         <button onClick={submitReview}>Submit</button>
       </div>
+      {movieList.map((movie) => {
+        return (
+          <h3>
+            Movie Name: {movie.movieName} | Review: {movie.movieReview}
+          </h3>
+        );
+      })}
     </div>
   );
 }
